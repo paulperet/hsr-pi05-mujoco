@@ -1,6 +1,7 @@
 <mujoco model="world">
     <option impratio="2.5" timestep="0.002"/>
     <default>
+        <geom condim="4" solimp="0.99 0.99 0.01" solref="0.01 1"/>
         <default class="wall">
             <geom rgba="2 2 2 1"/>
         </default>
@@ -31,9 +32,6 @@
         <!--<joint name='boxz' type='slide' axis='0 0 1' limited='false' damping='.01'/>-->
         <!--</default>-->
 
-    </default>
-    <default class="all">
-        <geom condim="4" solimp="0.99 0.99 0.01" solref="0.01 1"/>
     </default>
     <option cone="elliptic"/>
     <visual>

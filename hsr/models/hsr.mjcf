@@ -10,7 +10,7 @@
         <geom type="mesh" group="1" mesh="body_light"/>
         <geom type="mesh" group="1" mesh="torso_base"/>
         <geom type="mesh" mesh="base"/>
-        <body name="base_roll_link" pos="0 0hsr">
+        <body name="base_roll_link" pos="0 0 0">
             <inertial pos="-0.019482 0.002191 0.071013" quat="-0.163088 0.695987 0.176074 0.676759" mass="10.2394"
                       diaginertia="0.145076 0.0958414 0.0713624"/>
             <!--<joint name="base_roll_joint" pos="0 0 0" axis="0 0 1" />-->
