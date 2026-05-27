@@ -68,7 +68,7 @@
             <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="torso_light"/>
             <!--<geom type="mesh" mesh="torso"/>-->
             <body name="head_pan_link" pos="0 0 0">
-                <camera quat=".5 .5 -.5 -.5" name="rgb" pos="0 0 0"/>
+                <camera quat=".5 .5 -.5 -.5" name="head" pos="0 0 0"/>
                 <inertial pos="0.001724 -0.001969 -0.028886" quat="0.865343 0.459592 0.192259 -0.0547077"
                           mass="0.571903" diaginertia="0.00102408 0.00077623 0.000589392"/>
                 <!--<joint name="head_pan_joint" pos="0 0 0" axis="0 0 1" limited="false" range="-3.84 1.75" />-->
@@ -239,6 +239,7 @@
                                 <body name="hand_camera_frame" pos="0.039 0 -0.0045">
                                     <inertial pos="0.039 0 -0.0045" mass=".001" diaginertia="0 0 0"/>
                                     <body name="hand_camera_gazebo_frame" pos="0 0 0" quat="0.5 0.5 -0.5 0.5">
+                                        <camera name="hand" pos="0 0 0" euler="180 270 0"/>
                                         <inertial pos="0 0 0" quat="0.5 0.5 -0.5 0.5" mass=".001" diaginertia="0 0 0"/>
                                     </body>
                                 </body>
