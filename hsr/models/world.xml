@@ -99,21 +99,45 @@
         <include file="hsr.mjcf"/>
     </worldbody>
     <actuator>
-        <position gear="3" kp="300" name="slide_x_motor" joint="slide_x"
-                  forcelimited="true" forcerange="-100 100"
-                  ctrllimited="true" ctrlrange="-1 1"/>
-        <position gear="3" kp="300" name="slide_y_motor" joint="slide_y"
-                  forcelimited="true" forcerange="-100 100"
-                  ctrllimited="true" ctrlrange="-1 1"/>
+        <!-- Action indices 0-7: Absolute position control for arm/head joints -->
+        <!-- Ordering matches training schema: arm_lift, arm_flex, arm_roll, wrist_flex, wrist_roll, hand_motor, head_pan, head_tilt -->
         <position gear="5" kp="10" name="arm_lift_motor" joint="arm_lift_joint"
                   forcelimited="true" forcerange="-20 20"
-                  ctrllimited="true" ctrlrange="2.3 4.1"/>
+                  ctrllimited="true" ctrlrange="0 0.31"/>
         <position gear="1" kp="1000" name="arm_flex_motor" joint="arm_flex_joint"
                   forcelimited="true" forcerange="-15 35"
-                  ctrllimited="true" ctrlrange="-1.2 -.5"/>
+                  ctrllimited="true" ctrlrange="-3.14159 0"/>
+        <position gear="1" kp="1000" name="arm_roll_motor" joint="arm_roll_joint"
+                  forcelimited="true" forcerange="-20 20"
+                  ctrllimited="true" ctrlrange="-3.14159 3.14159"/>
+        <position gear="1" kp="1000" name="wrist_flex_motor" joint="wrist_flex_joint"
+                  forcelimited="true" forcerange="-20 20"
+                  ctrllimited="true" ctrlrange="-1.919 1.221"/>
         <position gear="1" kp="1000" name="wrist_roll_motor" joint="wrist_roll_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="-1.57 1.57"/>
+        <position gear="1" kp="100" name="hand_motor" joint="hand_motor_joint"
+                  forcelimited="true" forcerange="-20 20"
+                  ctrllimited="true" ctrlrange="-0.798 1.239"/>
+        <position gear="1" kp="500" name="head_pan_motor" joint="head_pan_joint"
+                  forcelimited="true" forcerange="-20 20"
+                  ctrllimited="true" ctrlrange="-3.14159 3.14159"/>
+        <position gear="1" kp="500" name="head_tilt_motor" joint="head_tilt_joint"
+                  forcelimited="true" forcerange="-20 20"
+                  ctrllimited="true" ctrlrange="-1.5708 0.5236"/>
+
+        <!-- Action indices 8-10: Base actuators (delta control applied in env.py) -->
+        <position gear="3" kp="300" name="base_x_motor" joint="slide_x"
+                  forcelimited="true" forcerange="-100 100"
+                  ctrllimited="true" ctrlrange="-1 1"/>
+        <position gear="3" kp="300" name="base_y_motor" joint="slide_y"
+                  forcelimited="true" forcerange="-100 100"
+                  ctrllimited="true" ctrlrange="-1 1"/>
+        <velocity gear="5" kv="100" name="base_roll_motor" joint="base_roll_joint"
+                  forcelimited="true" forcerange="-100 100"
+                  ctrllimited="true" ctrlrange="-3.14159 3.14159"/>
+
+        <!-- Secondary coupled actuators for finger proximal joints -->
         <position gear="1" kp="1000" name="hand_l_proximal_motor" joint="hand_l_proximal_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="0 0.349066"/>

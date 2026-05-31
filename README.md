@@ -5,7 +5,7 @@ git clone
 cd HSR-ENV
 python -m venv .venv
 source .venv/bin/activate
-pip install mujoco
+pip install -r requirements.txt
 ```
 
 Visualize the envs:
