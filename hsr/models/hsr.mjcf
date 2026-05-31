@@ -13,7 +13,7 @@
         <body name="base_roll_link" pos="0 0 0">
             <inertial pos="-0.019482 0.002191 0.071013" quat="-0.163088 0.695987 0.176074 0.676759" mass="10.2394"
                       diaginertia="0.145076 0.0958414 0.0713624"/>
-            <!--<joint name="base_roll_joint" pos="0 0 0" axis="0 0 1" />-->
+            <joint name="base_roll_joint" pos="0 0 0" axis="0 0 1" limited="false" damping="100" frictionloss="5"/>
             <body name="base_r_drive_wheel_link" pos="-0.11 -0.133 0.04">
                 <inertial pos="0 0 0" mass="0.2" diaginertia="0.015 0.015 0.015"/>
                 <!--<joint name="base_r_drive_wheel_joint" pos="0 0 0" axis="0 1 0" />-->
@@ -68,16 +68,15 @@
             <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="torso_light"/>
             <!--<geom type="mesh" mesh="torso"/>-->
             <body name="head_pan_link" pos="0 0 0">
-                <camera quat=".5 .5 -.5 -.5" name="head" pos="0 0 0"/>
                 <inertial pos="0.001724 -0.001969 -0.028886" quat="0.865343 0.459592 0.192259 -0.0547077"
                           mass="0.571903" diaginertia="0.00102408 0.00077623 0.000589392"/>
-                <!--<joint name="head_pan_joint" pos="0 0 0" axis="0 0 1" limited="false" range="-3.84 1.75" />-->
+                <joint name="head_pan_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-180 180" />
                 <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="head_pan"/>
                 <geom type="mesh" mesh="head_pan"/>
                 <body name="head_tilt_link" pos="0.02 0 0">
                     <inertial pos="-0.055376 -0.002436 0.117733" quat="0.973833 0.0131235 -0.226864 -0.00327368"
                               mass="2.1238" diaginertia="0.0218915 0.0149823 0.0091862"/>
-                    <!--<joint name="head_tilt_joint" pos="0 0 0" axis="0 -1 0" limited="false" range="-1.57 0.52" />-->
+                    <joint name="head_tilt_joint" pos="0 0 0" axis="0 -1 0" limited="true" range="-90 30" />
                     <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="head_upper"/>
                     <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="head_tilt"/>
                     <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="tablet_base"/>
@@ -109,7 +108,9 @@
                         <inertial pos="0.0223125 0.00308413 -0.0150742" quat="0.490393 0.50971 0.490151 0.509375"
                                   mass="0.187218" diaginertia="0.000444834 0.000441735 3.55076e-05"/>
                         <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="rgbd_light"/>
-                        <!--<geom type="mesh" mesh="rgbd"/>-->
+
+                        <geom type="mesh" mesh="rgbd"/>
+                        <camera name="rgbd" pos="0 0 0" euler="0 180 180" />
                         <body name="head_rgbd_sensor_gazebo_frame" pos="0 0 0" quat="0.5 0.5 -0.5 0.5">
                             <inertial pos="0 0 0" quat="0.5 0.5 -0.5 0.5" mass=".001" diaginertia="0 0 0"/>
                         </body>
@@ -117,7 +118,7 @@
                 </body>
             </body>
         </body>
-        <body name="arm_lift_link" pos="0 0 0.5">
+        <body name="arm_lift_link" pos="0 0 0.34">
               <!--pos="0 0 0.34">-->
             <!--<inertial pos="0.051549 0.042438 -0.064145" quat="-0.111496 0.499152 -0.110462 0.852182" mass="1.27582"-->
                       <!--diaginertia="0.00909548 0.00799354 0.00328099"/>-->
@@ -128,20 +129,20 @@
             <body name="arm_flex_link" pos="0.141 0.078 0">
                 <inertial pos="0.000632 0.006404 0.118529" quat="0.999966 -0.00826681 1.5355e-06 -1.33584e-06"
                           mass="1.33929" diaginertia="2.51222 2.51222 2.51222"/>
-                <joint name="arm_flex_joint" pos="0 0 0" axis="0 -1 0" limited="false" range="-1 0" damping="25"/>
+                <joint name="arm_flex_joint" pos="0 0 0" axis="0 -1 0" limited="true" range="-180 0" damping="25"/>
                 <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="arm_flex_light"/>
                 <geom type="mesh" mesh="arm_flex"/>
                 <body name="arm_roll_link" pos="0.005 0 0.345">
                     <inertial pos="-0.006927 0.002039 -0.064837" quat="0.704471 0.707171 -0.0444888 0.0406182"
                               mass="0.247936" diaginertia="0.00426928 0.00411787 0.00078077"/>
-                    <!--<joint name="arm_roll_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-2.09 3.84" />-->
+                    <joint name="arm_roll_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-180 180" />
                     <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="arm_roll_light"/>
                     <geom type="mesh" mesh="arm_roll"/>
                     <body name="wrist_flex_link" pos="0 0 0"
                           quat="0.4 0 .6 0">
                         <inertial pos="0.000131 -0.003929 0.00217" quat="0.672298 0.740248 0.0055614 0.00418043"
                                   mass="0.681225" diaginertia="7.43604e-05 6.49274e-05 3.81796e-05"/>
-                        <!--<joint name="wrist_flex_joint" pos="0 0 0" axis="0 -1 0" limited="true" range="-1.92 1.22" />-->
+                        <joint name="wrist_flex_joint" pos="0 0 0" axis="0 -1 0" limited="true" range="-110 69.9" />
                         <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.33 0.33 0.33 1"
                               mesh="wrist_flex"/>
                         <geom size="0.017 0.01" pos="0 0 0.04" type="cylinder" contype="0" conaffinity="0" group="1"
@@ -165,7 +166,7 @@
                                 <geom type="mesh" rgba="0.33 0.33 0.33 1" mesh="palm"/>
                                 <body name="hand_motor_dummy_link" pos="0 0 0">
                                     <inertial pos="0 0 0" mass="0.15" diaginertia="0.015 0.015 0.015"/>
-                                    <!--<joint name="hand_motor_joint" pos="0 0 0" axis="1 0 0" limited="false" range="-0.798 1.24" />-->
+                                    <joint name="hand_motor_joint" pos="0 0 0" axis="1 0 0" limited="false" range="-45.7 71" />
                                 </body>
                                 <body name="hand_l_proximal_link" pos="-0.01675 -0.0245 -0.0175">
                                     <inertial pos="0 0 0" mass="0.15" diaginertia="0.015 0.015 0.015"/>
