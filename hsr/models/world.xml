@@ -90,6 +90,20 @@
 <!--          <geom name="block" type="box" mass="1" size=".05 .025 .017" rgba=".8 .1 .1 1" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1"/>-->
 <!--          <freejoint name='blockjoint'/>-->
 <!--        </body>-->
+        <body name="block" pos="0 0 .423">
+          <geom name="block" type="box" mass="1" size=".05 .025 .017" rgba=".8 .1 .1 1" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1"/>
+          <freejoint name="blockjoint"/>
+        </body>
+
+        <body name="block2" pos="0 0.2 .423">
+          <geom name="block2" type="box" mass="1" size=".05 .025 .017" rgba=".1 .8 .1 1" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1"/>
+          <freejoint name="blockjoint2"/>
+        </body>
+
+        <body name="block3" pos="0 -0.2 .423">
+          <geom name="block3" type="box" mass="1" size=".05 .025 .017" rgba=".1 .1 .8 1" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1"/>
+          <freejoint name="blockjoint3"/>
+        </body>
 
         <!--<body name="block2" pos="0 0 .44">-->
           <!--<geom type="box" size=".0317 .0317 .0234" rgba=".1 .8 .1 1" condim="4" solimp="0.99 0.99 0.01" solref="0.01 1"/>-->
@@ -101,36 +115,36 @@
     <actuator>
         <!-- Action indices 0-7: Absolute position control for arm/head joints -->
         <!-- Ordering matches training schema: arm_lift, arm_flex, arm_roll, wrist_flex, wrist_roll, hand_motor, head_pan, head_tilt -->
-        <position gear="5" kp="10" name="arm_lift_motor" joint="arm_lift_joint"
+        <position gear="5" kp="10" dampratio="1" name="arm_lift_motor" joint="arm_lift_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="0 0.31"/>
-        <position gear="1" kp="1000" name="arm_flex_motor" joint="arm_flex_joint"
+        <position gear="1" kp="1000" dampratio="1" name="arm_flex_motor" joint="arm_flex_joint"
                   forcelimited="true" forcerange="-15 35"
                   ctrllimited="true" ctrlrange="-3.14159 0"/>
-        <position gear="1" kp="1000" name="arm_roll_motor" joint="arm_roll_joint"
+        <position gear="1" kp="1000" dampratio="1" name="arm_roll_motor" joint="arm_roll_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="-3.14159 3.14159"/>
-        <position gear="1" kp="1000" name="wrist_flex_motor" joint="wrist_flex_joint"
+        <position gear="1" kp="1000" dampratio="1" name="wrist_flex_motor" joint="wrist_flex_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="-1.919 1.221"/>
-        <position gear="1" kp="1000" name="wrist_roll_motor" joint="wrist_roll_joint"
+        <position gear="1" kp="1000" dampratio="1" name="wrist_roll_motor" joint="wrist_roll_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="-1.57 1.57"/>
-        <position gear="1" kp="100" name="hand_motor" joint="hand_motor_joint"
+        <position gear="1" kp="100" dampratio="1" name="hand_motor" joint="hand_motor_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="-0.798 1.239"/>
-        <position gear="1" kp="500" name="head_pan_motor" joint="head_pan_joint"
+        <position gear="1" kp="500" dampratio="1" name="head_pan_motor" joint="head_pan_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="-3.14159 3.14159"/>
-        <position gear="1" kp="500" name="head_tilt_motor" joint="head_tilt_joint"
+        <position gear="1" kp="500" dampratio="1" name="head_tilt_motor" joint="head_tilt_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="-1.5708 0.5236"/>
 
         <!-- Action indices 8-10: Base actuators (delta control applied in env.py) -->
-        <position gear="3" kp="300" name="base_x_motor" joint="slide_x"
+        <position gear="3" kp="300" dampratio="1" name="base_x_motor" joint="slide_x"
                   forcelimited="true" forcerange="-100 100"
                   ctrllimited="true" ctrlrange="-1 1"/>
-        <position gear="3" kp="300" name="base_y_motor" joint="slide_y"
+        <position gear="3" kp="300" dampratio="1" name="base_y_motor" joint="slide_y"
                   forcelimited="true" forcerange="-100 100"
                   ctrllimited="true" ctrlrange="-1 1"/>
         <velocity gear="5" kv="100" name="base_roll_motor" joint="base_roll_joint"
@@ -138,10 +152,10 @@
                   ctrllimited="true" ctrlrange="-3.14159 3.14159"/>
 
         <!-- Secondary coupled actuators for finger proximal joints -->
-        <position gear="1" kp="1000" name="hand_l_proximal_motor" joint="hand_l_proximal_joint"
+        <position gear="1" kp="1000" dampratio="1" name="hand_l_proximal_motor" joint="hand_l_proximal_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="0 0.349066"/>
-        <position gear="1" kp="1000" name="hand_r_proximal_motor" joint="hand_r_proximal_joint"
+        <position gear="1" kp="1000" dampratio="1" name="hand_r_proximal_motor" joint="hand_r_proximal_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="0 0.349066"/>
 
@@ -154,6 +168,8 @@
         <exclude body1="wrist_flex_link" body2="wrist_roll_link"/>
         <exclude body1="wrist_roll_link" body2="hand_palm_link"/>
         <exclude body1="arm_flex_link" body2="hand_palm_link"/>
+        <exclude body1="arm_lift_link" body2="head_pan_link"/>
+        <exclude body1="base_link" body2="arm_flex_link"/>
         <exclude body1="hand_palm_link" body2="hand_l_proximal_link"/>
         <exclude body1="hand_l_proximal_link" body2="hand_l_spring_proximal_link"/>
         <exclude body1="hand_l_spring_proximal_link" body2="hand_l_mimic_distal_link"/>

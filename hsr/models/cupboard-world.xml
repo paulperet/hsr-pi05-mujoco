@@ -152,6 +152,7 @@
         <exclude body1="wrist_flex_link" body2="wrist_roll_link"/>
         <exclude body1="wrist_roll_link" body2="hand_palm_link"/>
         <exclude body1="arm_flex_link" body2="hand_palm_link"/>
+        <exclude body1="base_link" body2="arm_flex_link"/>
         <exclude body1="hand_palm_link" body2="hand_l_proximal_link"/>
         <exclude body1="hand_l_proximal_link" body2="hand_l_spring_proximal_link"/>
         <exclude body1="hand_l_spring_proximal_link" body2="hand_l_mimic_distal_link"/>

@@ -13,3 +13,4 @@ dist/
 build/
 hsr_env.egg-info
 MUJOCO_LOG.TXT
+data/

@@ -72,8 +72,9 @@ def build_observation(env, task: str):
     state_tensor = torch.from_numpy(state).float()
 
     raw_batch = {
-        "observation.image.head": head_tensor,
-        "observation.image.hand": hand_tensor,
+        "observation.images.base_0_rgb": head_tensor,
+        "observation.images.right_wrist_0_rgb": hand_tensor,
+        "observation.images.left_wrist_0_rgb": torch.zeros_like(head_tensor),
         "observation.state": state_tensor,
         "task": task,
     }
