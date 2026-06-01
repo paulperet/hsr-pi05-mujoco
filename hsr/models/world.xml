@@ -148,7 +148,7 @@
         <position gear="3" kp="300" dampratio="1" name="base_y_motor" joint="slide_y"
                   forcelimited="true" forcerange="-100 100"
                   ctrllimited="false" ctrlrange="-10 10"/>
-        <velocity gear="5" kv="100" name="base_roll_motor" joint="base_roll_joint"
+        <position gear="5" kp="100" name="base_roll_motor" joint="base_roll_joint"
                   forcelimited="true" forcerange="-100 100"
                   ctrllimited="true" ctrlrange="-3.14159 3.14159"/>
 

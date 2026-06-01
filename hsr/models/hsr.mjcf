@@ -111,7 +111,15 @@
                                   mass="0.187218" diaginertia="0.000444834 0.000441735 3.55076e-05"/>
                         <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="rgbd_light"/>
                         <geom type="mesh" mesh="rgbd"/>
-                        <camera name="rgbd" pos="0 0 0" euler="0 3.14159 3.14159" fovy="43"/>
+                        <!-- AIRoA MoMa official head RGB intrinsics (robot002, the most common robot,
+                             /hsrb/head_rgbd_sensor/rgb/camera_info): K=[533.209 0 320.368; 0 534.212 237.942; 0 0 1],
+                             640x480, plumb_bob. Encoded as pixel intrinsics so MuJoCo derives fovy=48.385 deg and the
+                             principal-point offset. principalpixel=(W/2-cx, H/2-cy); sensorsize is nominal (it cancels
+                             out for *pixel intrinsics). Lens distortion D is not representable by the pinhole renderer. -->
+                        <camera name="rgbd" pos="0 0 0" euler="0 3.14159 3.14159"
+                                resolution="640 480" sensorsize="0.0048 0.0036"
+                                focalpixel="533.2088513078152 534.2119148902636"
+                                principalpixel="-0.368004 2.058287"/>
                         <body name="head_rgbd_sensor_gazebo_frame" pos="0 0 0" quat="0.5 0.5 -0.5 0.5">
                             <inertial pos="0 0 0" quat="0.5 0.5 -0.5 0.5" mass=".001" diaginertia="0 0 0"/>
                         </body>
@@ -254,7 +262,13 @@
                                 <body name="hand_camera_frame" pos="0.039 0 -0.0045">
                                     <inertial pos="0.039 0 -0.0045" mass=".001" diaginertia="0 0 0"/>
                                     <body name="hand_camera_gazebo_frame" pos="0 0 0" quat="0.5 0.5 -0.5 0.5">
-                                        <camera name="hand" pos="0 0 0" euler="1.7 4.71239 0" fovy="66"/>
+                                        <!-- AIRoA MoMa's /hsrb/hand_camera/camera_info is all-zero in every episode, so the
+                                             authoritative source is Toyota's own hsrb_description: the hand camera is the
+                                             "wide_camera" (urdf/sensors/wide_camera.gazebo.xacro) with horizontal_fov=2.00 rad
+                                             at 640x480, zero distortion. hfov 2.0 rad -> fx=fy=205.47 px (centered) ->
+                                             MuJoCo fovy=98.865 deg (verified to reproduce hfov=2.0 at 4:3). This is Toyota's
+                                             Gazebo sim FOV, not a calibrated real intrinsic (none is published for this camera). -->
+                                        <camera name="hand" pos="0 0 0" euler="1.7 4.71239 0" fovy="98.8648" resolution="640 480"/>
                                         <inertial pos="0 0 0" quat="0.5 0.5 -0.5 0.5" mass=".001" diaginertia="0 0 0"/>
                                     </body>
                                 </body>
