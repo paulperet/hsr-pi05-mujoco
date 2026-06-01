@@ -38,8 +38,9 @@
         <map znear=".03"/>
         <global offwidth="1000" offheight="1000"/>
     </visual>
-    <compiler coordinate="local" angle="degree" meshdir="../hsr_meshes/meshes/" inertiafromgeom="true"/>
+    <compiler coordinate="local" angle="radian" meshdir="../hsr_meshes/meshes/" inertiafromgeom="true"/>
     <size njmax="500" nconmax="100"/>
+
     <asset>
         <mesh name="base_light" file="base_v2/base_light.stl"/>
         <mesh name="body_light" file="base_v2/body_light.stl"/>
@@ -115,38 +116,38 @@
     <actuator>
         <!-- Action indices 0-7: Absolute position control for arm/head joints -->
         <!-- Ordering matches training schema: arm_lift, arm_flex, arm_roll, wrist_flex, wrist_roll, hand_motor, head_pan, head_tilt -->
-        <position gear="5" kp="10" dampratio="1" name="arm_lift_motor" joint="arm_lift_joint"
-                  forcelimited="true" forcerange="-20 20"
-                  ctrllimited="true" ctrlrange="0 0.31"/>
+        <position gear="5" kp="1000" dampratio="1" name="arm_lift_motor" joint="arm_lift_joint"
+                  forcelimited="true" forcerange="-100 100"
+                  ctrllimited="true" ctrlrange="0 0.34"/>
         <position gear="1" kp="1000" dampratio="1" name="arm_flex_motor" joint="arm_flex_joint"
                   forcelimited="true" forcerange="-15 35"
-                  ctrllimited="true" ctrlrange="-3.14159 0"/>
+                  ctrllimited="true" ctrlrange="-2.62 0"/>
         <position gear="1" kp="1000" dampratio="1" name="arm_roll_motor" joint="arm_roll_joint"
                   forcelimited="true" forcerange="-20 20"
-                  ctrllimited="true" ctrlrange="-3.14159 3.14159"/>
+                  ctrllimited="true" ctrlrange="-2.09 3.84"/>
         <position gear="1" kp="1000" dampratio="1" name="wrist_flex_motor" joint="wrist_flex_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="-1.919 1.221"/>
         <position gear="1" kp="1000" dampratio="1" name="wrist_roll_motor" joint="wrist_roll_joint"
                   forcelimited="true" forcerange="-20 20"
-                  ctrllimited="true" ctrlrange="-1.57 1.57"/>
+                  ctrllimited="true" ctrlrange="-1.92 3.67"/>
         <position gear="1" kp="100" dampratio="1" name="hand_motor" joint="hand_motor_joint"
                   forcelimited="true" forcerange="-20 20"
                   ctrllimited="true" ctrlrange="-0.798 1.239"/>
         <position gear="1" kp="500" dampratio="1" name="head_pan_motor" joint="head_pan_joint"
                   forcelimited="true" forcerange="-20 20"
-                  ctrllimited="true" ctrlrange="-3.14159 3.14159"/>
+                  ctrllimited="true" ctrlrange="-3.84 1.75"/>
         <position gear="1" kp="500" dampratio="1" name="head_tilt_motor" joint="head_tilt_joint"
                   forcelimited="true" forcerange="-20 20"
-                  ctrllimited="true" ctrlrange="-1.5708 0.5236"/>
+                  ctrllimited="true" ctrlrange="-1.57 0.52"/>
 
         <!-- Action indices 8-10: Base actuators (delta control applied in env.py) -->
         <position gear="3" kp="300" dampratio="1" name="base_x_motor" joint="slide_x"
                   forcelimited="true" forcerange="-100 100"
-                  ctrllimited="true" ctrlrange="-1 1"/>
+                  ctrllimited="false" ctrlrange="-10 10"/>
         <position gear="3" kp="300" dampratio="1" name="base_y_motor" joint="slide_y"
                   forcelimited="true" forcerange="-100 100"
-                  ctrllimited="true" ctrlrange="-1 1"/>
+                  ctrllimited="false" ctrlrange="-10 10"/>
         <velocity gear="5" kv="100" name="base_roll_motor" joint="base_roll_joint"
                   forcelimited="true" forcerange="-100 100"
                   ctrllimited="true" ctrlrange="-3.14159 3.14159"/>

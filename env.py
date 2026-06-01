@@ -41,6 +41,13 @@ class HSREnv(gym.Env):
         "base_roll_joint",
     ]
 
+    # arm_lift_joint range mismatch between dataset and sim.
+    # Dataset (real HSR) spans ~[0, 0.69]; this sim model spans [0, 0.34].
+    # Actions are scaled DATASET -> SIM; states are scaled SIM -> DATASET so
+    # the policy always sees/produces values in its trained coordinate frame.
+    ARM_LIFT_DATA_MAX = 0.69
+    ARM_LIFT_SIM_MAX = 0.34
+
     # Actuator names in world.xml, ordered to match schema action indices
     ACTUATOR_NAMES = [
         "arm_lift_motor",    # 0
@@ -161,6 +168,8 @@ class HSREnv(gym.Env):
             [self.data.qpos[idx] for idx in self._state_joint_ids],
             dtype=np.float32
         )
+        # Scale arm_lift state from sim frame [0, 0.34] back into dataset frame [0, 0.69]
+        state[0] *= self.ARM_LIFT_DATA_MAX / self.ARM_LIFT_SIM_MAX
         return state
 
     def _get_info(self):
@@ -185,6 +194,10 @@ class HSREnv(gym.Env):
         Args:
         - action: np.ndarray of shape (11,) matching the training schema.
         """
+        # Scale arm_lift action from dataset frame [0, 0.69] into sim frame [0, 0.34]
+        action = action.copy()
+        action[0] *= self.ARM_LIFT_SIM_MAX / self.ARM_LIFT_DATA_MAX
+
         # Set absolute position targets for arm/head joint actuators (indices 0-7)
         for i in range(8):
             self.data.ctrl[self._actuator_ids[i]] = action[i]

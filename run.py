@@ -15,8 +15,8 @@ import torch
 from env import HSREnv
 from lerobot.policies.pi05 import PI05Policy
 from lerobot.policies.factory import make_pre_post_processors
+from lerobot.configs.policies import PreTrainedConfig
 from peft import PeftModel
-
 
 def load_policy(model_id: str, device: torch.device):
     """Load PI0.5 policy and its pre/post processors from HuggingFace.
@@ -28,8 +28,19 @@ def load_policy(model_id: str, device: torch.device):
     Returns:
         tuple: (policy, preprocessor, postprocessor)
     """
-    policy = PI05Policy.from_pretrained("lerobot/pi05_base").to(device).eval()
+    # Use the FINE-TUNED config (input_features = observation.image.head/hand,
+    # state[8], action[11]) so the loaded model validates against our schema --
+    # not the base model's DROID slots (base_0_rgb/left_wrist_0_rgb/...).
+    # Weight shapes are unchanged (camera count only affects token count;
+    # state/action are padded to max_*_dim=32), so base weights load cleanly.
+    config = PreTrainedConfig.from_pretrained(model_id)
+    policy = PI05Policy.from_pretrained(
+        "lerobot/pi05_base", config=config
+    ).to(device).eval()
+
+    # Attach the LoRA adapter, then re-set eval (PeftModel wrap resets train mode)
     policy = PeftModel.from_pretrained(policy, model_id)
+    policy.eval()
 
     preprocess, postprocess = make_pre_post_processors(
         policy.config,
@@ -71,10 +82,11 @@ def build_observation(env, task: str):
     state = env.get_state()
     state_tensor = torch.from_numpy(state).float()
 
+    # Keys MUST match the training schema (see train_config.json input_features):
+    #   observation.image.head, observation.image.hand, observation.state
     raw_batch = {
-        "observation.images.base_0_rgb": head_tensor,
-        "observation.images.right_wrist_0_rgb": hand_tensor,
-        "observation.images.left_wrist_0_rgb": torch.zeros_like(head_tensor),
+        "observation.image.head": head_tensor,
+        "observation.image.hand": hand_tensor,
         "observation.state": state_tensor,
         "task": task,
     }
@@ -91,9 +103,20 @@ def run_evaluation(args):
     # Allow pytorch to use expandable memory segments
     os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 
-    # Select device
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    # Select device: prefer CUDA, then Apple MPS, then CPU
+    if torch.cuda.is_available():
+        device = torch.device("cuda:0")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
     print(f"Using device: {device}")
+
+    # torch.compile's inductor backend fails to autotune on MPS/CPU, so disable
+    # dynamo off CUDA (the model still runs eagerly, just without compilation).
+    if device.type != "cuda":
+        os.environ["TORCHDYNAMO_DISABLE"] = "1"
+        os.environ["TORCH_COMPILE_DISABLE"] = "1"
 
     # Load policy
     print(f"Loading policy from {args.model_id}...")
