@@ -1,9 +1,9 @@
 <mujoco model="hsr">
     <body name="base_link" pos="-.46 -.081 0">
         <!--<site name="touchsensor_site" size="0.25 .5" pos="0 0 .5" type="cylinder" rgba="1 0 0 0"/>-->
-        <joint axis="1 0 0" damping="2200" name="slide_x" pos="0 0 0" type="slide" limited="false" range="-2 2"/>
+        <joint axis="1 0 0" damping="2200" name="slide_x" pos="0 0 0" type="slide" limited="false" range="-10 10"/>
         <!--<joint axis="1 0 0" damping="2200" name="slide_x" pos="0 0 0" type="slide" limited="true" range="-.02 .02"/>-->
-        <joint axis="0 1 0" damping="2200" name="slide_y" pos="0 0 0" type="slide" limited="false" range="-2 2"/>
+        <joint axis="0 1 0" damping="2200" name="slide_y" pos="0 0 0" type="slide" limited="false" range="-10 10"/>
         <inertial pos="-0.025978 -0.005498 0.17633" quat="0.995796 0.0411155 -0.0685908 0.0446655" mass="50"
                   diaginertia="0.378627 0.344913 0.145159"/>
         <geom type="mesh" group="1" mesh="base_light"/>
@@ -137,7 +137,7 @@
             <geom type="mesh" mesh="shoulder"/>
             <body name="arm_flex_link" pos="0.141 0.078 0">
                 <inertial pos="0.000632 0.006404 0.118529" quat="0.999966 -0.00826681 1.5355e-06 -1.33584e-06"
-                          mass="1.33929" diaginertia="2.51222 2.51222 2.51222"/>
+                          mass="1.33929" diaginertia="0.0092 0.0085 0.0020"/>
                 <!-- FIX #8: range corrected from "-180 0" deg to radians -->
                 <joint name="arm_flex_joint" pos="0 0 0" axis="0 -1 0" limited="true" range="-2.62 0.0" damping="25"/>
                 <geom type="mesh" contype="0" conaffinity="0" group="1" mesh="arm_flex_light"/>

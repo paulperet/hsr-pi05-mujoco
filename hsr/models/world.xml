@@ -38,7 +38,7 @@
         <map znear=".03"/>
         <global offwidth="1000" offheight="1000"/>
     </visual>
-    <compiler coordinate="local" angle="radian" meshdir="../hsr_meshes/meshes/" inertiafromgeom="true"/>
+    <compiler coordinate="local" angle="radian" meshdir="../hsr_meshes/meshes/" inertiafromgeom="auto"/>
     <size njmax="500" nconmax="100"/>
 
     <asset>
@@ -116,7 +116,7 @@
     <actuator>
         <!-- Action indices 0-7: Absolute position control for arm/head joints -->
         <!-- Ordering matches training schema: arm_lift, arm_flex, arm_roll, wrist_flex, wrist_roll, hand_motor, head_pan, head_tilt -->
-        <position gear="5" kp="1000" dampratio="1" name="arm_lift_motor" joint="arm_lift_joint"
+        <position gear="1" kp="5000" dampratio="1" name="arm_lift_motor" joint="arm_lift_joint"
                   forcelimited="true" forcerange="-100 100"
                   ctrllimited="true" ctrlrange="0 0.34"/>
         <position gear="1" kp="1000" dampratio="1" name="arm_flex_motor" joint="arm_flex_joint"
@@ -144,10 +144,10 @@
         <!-- Action indices 8-10: Base actuators (delta control applied in env.py) -->
         <position gear="3" kp="300" dampratio="1" name="base_x_motor" joint="slide_x"
                   forcelimited="true" forcerange="-100 100"
-                  ctrllimited="false" ctrlrange="-10 10"/>
+                  ctrllimited="true" ctrlrange="-10 10"/>
         <position gear="3" kp="300" dampratio="1" name="base_y_motor" joint="slide_y"
                   forcelimited="true" forcerange="-100 100"
-                  ctrllimited="false" ctrlrange="-10 10"/>
+                  ctrllimited="true" ctrlrange="-10 10"/>
         <position gear="5" kp="100" name="base_roll_motor" joint="base_roll_joint"
                   forcelimited="true" forcerange="-100 100"
                   ctrllimited="true" ctrlrange="-3.14159 3.14159"/>

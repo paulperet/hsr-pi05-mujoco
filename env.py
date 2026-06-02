@@ -202,16 +202,23 @@ class HSREnv(gym.Env):
         for i in range(8):
             self.data.ctrl[self._actuator_ids[i]] = action[i]
 
-        # Apply delta base actions: add to current position for base_x/base_y
+        # Apply delta base actions. Dataset base_x/base_y/base_t are per-frame
+        # position deltas in the robot BODY frame (x forward, y left in meters;
+        # yaw in radians). slide_x/slide_y are WORLD-frame joints, so rotate the
+        # body-frame translation by the current yaw before integrating it onto
+        # the current world position. base_t (yaw) is frame-invariant.
         current_base_x = self.data.qpos[self._base_joint_ids[0]]
         current_base_y = self.data.qpos[self._base_joint_ids[1]]
-        current_base_roll = self.data.qpos[self._base_joint_ids[2]]
+        current_base_yaw = self.data.qpos[self._base_joint_ids[2]]
 
-        self.data.ctrl[self._actuator_ids[8]] = current_base_x + action[8]
-        self.data.ctrl[self._actuator_ids[9]] = current_base_y + action[9]
+        cos_yaw = np.cos(current_base_yaw)
+        sin_yaw = np.sin(current_base_yaw)
+        world_dx = cos_yaw * action[8] - sin_yaw * action[9]
+        world_dy = sin_yaw * action[8] + cos_yaw * action[9]
 
-        # base_t is velocity-controlled (delta rotation)
-        self.data.ctrl[self._actuator_ids[10]] = current_base_roll + action[10]
+        self.data.ctrl[self._actuator_ids[8]] = current_base_x + world_dx
+        self.data.ctrl[self._actuator_ids[9]] = current_base_y + world_dy
+        self.data.ctrl[self._actuator_ids[10]] = current_base_yaw + action[10]
 
         # Couple finger proximal joints to hand_motor (simple proportional mapping)
         hand_motor_val = action[5]
