@@ -63,6 +63,22 @@ class HSREnv(gym.Env):
         "base_roll_motor",   # 10
     ]
 
+    # Real AIRoA MoMa episode-start joint configuration (dataset frame), taken from
+    # the first observation.state of the training data. The head is pitched ~42 deg
+    # DOWN (head_tilt = -0.735) to look at the tabletop, and the arm is folded. The
+    # sim previously reset to all-zeros (head level -> camera saw a blank wall), which
+    # put the policy's first observations far out of the training distribution.
+    INIT_POSE = {
+        "arm_lift_joint": 0.0,
+        "arm_flex_joint": -0.003,
+        "arm_roll_joint": -1.578,
+        "wrist_flex_joint": -1.770,
+        "wrist_roll_joint": -0.176,
+        "hand_motor_joint": 0.262,
+        "head_pan_joint": 0.0,
+        "head_tilt_joint": -0.735,
+    }
+
     def __init__(self, args: dict):
         """Initialize HSR Environment for PI0.5 policy evaluation.
 
@@ -112,6 +128,46 @@ class HSREnv(gym.Env):
         for name in self.ACTUATOR_NAMES:
             aid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, name)
             self._actuator_ids.append(aid)
+
+        # Coupled finger actuators, driven from hand_motor (action[5]). Not part
+        # of the 11-dim action schema, so kept out of ACTUATOR_NAMES; cached here
+        # to avoid a per-step name lookup in step().
+        self._hand_l_proximal_id = mujoco.mj_name2id(
+            self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, "hand_l_proximal_motor")
+        self._hand_r_proximal_id = mujoco.mj_name2id(
+            self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, "hand_r_proximal_motor")
+
+        # --- Real episode-start pose (see INIT_POSE) --------------------------------
+        # Place the joints at the real starting configuration so the first observation
+        # matches the training distribution (head down on the table, arm folded), and
+        # build matching actuator hold targets so the position servos keep this pose
+        # instead of driving every joint back to zero on the first step.
+        pose = dict(self.INIT_POSE)
+        pose["arm_lift_joint"] *= self.ARM_LIFT_SIM_MAX / self.ARM_LIFT_DATA_MAX
+        grip = float(np.clip(
+            (self.INIT_POSE["hand_motor_joint"] + 0.798) / (1.239 + 0.798), 0, 1) * 0.349066)
+        pose["hand_l_proximal_joint"] = grip
+        pose["hand_r_proximal_joint"] = grip
+        for jname, val in pose.items():
+            jid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, jname)
+            if jid >= 0:
+                self.data.qpos[self.model.jnt_qposadr[jid]] = val
+        mujoco.mj_forward(self.model, self.data)
+
+        # Actuator hold targets matching the pose. Indices 0-7 are the arm/head
+        # actuators (arm_lift in sim frame); base (8-10) holds the origin at 0.
+        self._init_ctrl = np.zeros(self.model.nu, dtype=np.float64)
+        arm_head_targets = [
+            pose["arm_lift_joint"], pose["arm_flex_joint"], pose["arm_roll_joint"],
+            pose["wrist_flex_joint"], pose["wrist_roll_joint"], pose["hand_motor_joint"],
+            pose["head_pan_joint"], pose["head_tilt_joint"],
+        ]
+        for i, target in enumerate(arm_head_targets):
+            self._init_ctrl[self._actuator_ids[i]] = target
+        for mid in (self._hand_l_proximal_id, self._hand_r_proximal_id):
+            if mid >= 0:
+                self._init_ctrl[mid] = grip
+        # ----------------------------------------------------------------------------
 
         # Dual cameras matching training schema
         cam_args = {'cam_width': self.cam_width, 'cam_height': self.cam_height}
@@ -225,10 +281,8 @@ class HSREnv(gym.Env):
         # Map hand_motor range to proximal joint range [0, 0.349066]
         grip_frac = np.clip((hand_motor_val + 0.798) / (1.239 + 0.798), 0, 1)
         grip_val = grip_frac * 0.349066
-        hand_l_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, "hand_l_proximal_motor")
-        hand_r_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, "hand_r_proximal_motor")
-        self.data.ctrl[hand_l_id] = grip_val
-        self.data.ctrl[hand_r_id] = grip_val
+        self.data.ctrl[self._hand_l_proximal_id] = grip_val
+        self.data.ctrl[self._hand_r_proximal_id] = grip_val
 
         # Simulate and record
         for i in range(self.iters):
@@ -251,7 +305,7 @@ class HSREnv(gym.Env):
         """
         self.data.qpos[:] = self._init_qpos
         self.data.qvel[:] = self._init_qvel
-        self.data.ctrl[:] = 0
+        self.data.ctrl[:] = self._init_ctrl
         mujoco.mj_forward(self.model, self.data)
 
         # Reset video recording buffers

@@ -35,11 +35,25 @@
     </default>
     <option cone="elliptic"/>
     <visual>
-        <map znear=".03"/>
-        <global offwidth="1000" offheight="1000"/>
+        <!-- Strong ambient + headlight so surfaces are never near-black like the real,
+             bounce-lit rooms the policy was trained on (was: dim single light -> black void). -->
+        <headlight ambient="0.24 0.24 0.24" diffuse="0.15 0.15 0.15" specular="0.12 0.12 0.12"/>
+        <!-- Crisp soft shadows + multisampling for realism. -->
+        <quality shadowsize="4096" offsamples="8"/>
+        <!-- Clip planes are FRACTIONS of stat.extent (pinned below to 2 m), so near
+             plane = 0.015*2 = 0.03 m and far = 12*2 = 24 m. Without pinning, the big
+             room inflated stat.extent to ~10 m and pushed the near plane to 0.32 m,
+             which clipped the robot's own arm and any close object in the on-robot
+             cameras (geoms went see-through / vanished off-center). -->
+        <map znear="0.015" zfar="12" haze="0.1"/>
+        <rgba haze="0.86 0.88 0.90 1"/>
+        <global offwidth="1000" offheight="1000" azimuth="150" elevation="-20"/>
     </visual>
-    <compiler coordinate="local" angle="radian" meshdir="../hsr_meshes/meshes/" inertiafromgeom="auto"/>
+    <compiler coordinate="local" angle="radian" meshdir="../hsr_meshes/meshes/" texturedir="../hsr_textures/textures/" inertiafromgeom="auto"/>
     <size njmax="500" nconmax="100"/>
+    <!-- Pin model extent to the workspace scale so camera near/far clip planes (which
+         scale with stat.extent) stay correct regardless of the enclosing room size. -->
+    <statistic extent="2" center="0 0 0.6"/>
 
     <asset>
         <mesh name="base_light" file="base_v2/base_light.stl"/>
@@ -70,17 +84,58 @@
         <mesh name="l_distal" file="hand_v0/l_distal.stl"/>
         <mesh name="r_proximal" file="hand_v0/r_proximal.stl"/>
         <mesh name="r_distal" file="hand_v0/r_distal.stl"/>
+
+        <!-- ===== Realism: scene textures & materials ===== -->
+        <!-- Neutral light-gray gradient: an open top reads as a bright ceiling, not blue
+             sky (the wide hand camera can glimpse it, so keep it color-neutral). -->
+        <texture name="skytex" type="skybox" builtin="gradient"
+                 rgb1="0.88 0.88 0.86" rgb2="0.62 0.62 0.63" width="512" height="3072"/>
+        <!-- Tiled marble floor (real lab/home floor) from the existing texture pack. -->
+        <texture name="floortex" type="2d" file="floor.png"/>
+        <material name="floormat" texture="floortex" texrepeat="6 6" texuniform="true"
+                  rgba="0.72 0.70 0.66 1" specular="0.2" shininess="0.3" reflectance="0.04"/>
+        <!-- White melamine worktable, matching the real AIRoA desk (white, slight sheen). -->
+        <material name="tablemat" rgba="0.84 0.84 0.83 1" specular="0.4" shininess="0.5" reflectance="0.05"/>
+        <!-- Matte painted wall (neutral mid-gray, matching the real room). -->
+        <material name="wallmat" rgba="0.68 0.68 0.66 1" specular="0.1" shininess="0.1" reflectance="0.0"/>
+        <!-- Glossy ceramic mug. -->
+        <material name="cupmat" rgba="0.20 0.45 0.82 1" specular="0.6" shininess="0.6" reflectance="0.1"/>
     </asset>
     <worldbody>
-        <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
-        <geom name="floor" type="plane" size="2 2 2" pos="0 0 0" class="floor"/>
+        <!-- ===== Realism: lighting. Directional (sun-like) so the room is evenly lit
+             with no spotlight hot-spot; one key casts soft shadows, two dim fills
+             soften the shadow side. (Directional lights + a closed ceiling would put
+             the whole floor in the ceiling's shadow, so the ceiling is left open.) ===== -->
+        <light name="key" directional="true" dir="-0.2 -0.35 -1"
+               diffuse="0.4 0.4 0.38" specular="0.22 0.22 0.22" castshadow="true"/>
+        <light name="fill_l" directional="true" dir="0.35 -0.5 -0.7"
+               diffuse="0.13 0.13 0.13" specular="0 0 0" castshadow="false"/>
+        <light name="fill_r" directional="true" dir="0.35 0.5 -0.7"
+               diffuse="0.13 0.13 0.13" specular="0 0 0" castshadow="false"/>
+
+        <!-- ===== Realism: textured floor (enlarged to fill the room) ===== -->
+        <geom name="floor" type="plane" size="4 4 0.1" pos="0 0 0" material="floormat"/>
+
+        <!-- ===== Realism: room walls + ceiling. Visual only (contype/conaffinity 0)
+             so they give the head camera a real background without ever adding contacts
+             the policy never saw in the real-world training data. ===== -->
+        <geom name="wall_px" type="box" pos="2.5 0 1.4"  size="0.05 2.5 1.4" material="wallmat" contype="0" conaffinity="0"/>
+        <geom name="wall_nx" type="box" pos="-2.5 0 1.4" size="0.05 2.5 1.4" material="wallmat" contype="0" conaffinity="0"/>
+        <geom name="wall_py" type="box" pos="0 2.5 1.4"  size="2.5 0.05 1.4" material="wallmat" contype="0" conaffinity="0"/>
+        <geom name="wall_ny" type="box" pos="0 -2.5 1.4" size="2.5 0.05 1.4" material="wallmat" contype="0" conaffinity="0"/>
 
         <body name="goal" pos="0 0 0" mocap="true">
-            <site name="goal" size=".01 .01 .01" pos="0 0 0" rgba="0 1 0 .2"/>
+            <!-- Invisible to cameras: real training images have no debug marker. -->
+            <site name="goal" size=".01 .01 .01" pos="0 0 0" rgba="0 1 0 0"/>
         </body>
 
         <body name="pan" pos="0 0 .4">
-            <geom type="box" size=".17 .2667 .005" class="box"/>
+            <geom type="box" size=".17 .2667 .005" material="tablemat"/>
+            <!-- Visual-only legs (no collision) so the worktable reads as real furniture. -->
+            <geom type="box" pos=" .15  .24 -.2" size=".015 .015 .2" material="tablemat" contype="0" conaffinity="0"/>
+            <geom type="box" pos=" .15 -.24 -.2" size=".015 .015 .2" material="tablemat" contype="0" conaffinity="0"/>
+            <geom type="box" pos="-.15  .24 -.2" size=".015 .015 .2" material="tablemat" contype="0" conaffinity="0"/>
+            <geom type="box" pos="-.15 -.24 -.2" size=".015 .015 .2" material="tablemat" contype="0" conaffinity="0"/>
             <!--<geom type="box" size=".001  .2667 .01" pos=".17 0  .01"  class="clear"/>-->
             <!--<geom type="box" size=".001  .2667 .01" pos="-.17 0 .01" class="clear"/>-->
             <!--<geom type="box" size=".17 .001  .01" pos="0 .2667  .01"  class="clear"/>-->
@@ -95,12 +150,12 @@
         <freejoint name="cupjoint"/>
         <!-- mug body: cylinder upright along z, sitting on its base -->
         <geom name="cup_body" type="cylinder" size=".04 .05" pos="0 0 .05" mass=".22"
-                condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba=".25 .5 .85 1"/>
+                condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" material="cupmat"/>
         <!-- handle: 4 capsules forming a C on the +x side; fromto = the two endpoints, the single size value is the radius -->
-        <geom name="cup_h0" type="capsule" size=".006" fromto="0.040 0 0.078  0.070 0 0.072" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba=".25 .5 .85 1"/>
-        <geom name="cup_h1" type="capsule" size=".006" fromto="0.070 0 0.072  0.078 0 0.054" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba=".25 .5 .85 1"/>
-        <geom name="cup_h2" type="capsule" size=".006" fromto="0.078 0 0.054  0.070 0 0.036" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba=".25 .5 .85 1"/>
-        <geom name="cup_h3" type="capsule" size=".006" fromto="0.070 0 0.036  0.040 0 0.030" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba=".25 .5 .85 1"/>
+        <geom name="cup_h0" type="capsule" size=".006" fromto="0.040 0 0.078  0.070 0 0.072" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" material="cupmat"/>
+        <geom name="cup_h1" type="capsule" size=".006" fromto="0.070 0 0.072  0.078 0 0.054" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" material="cupmat"/>
+        <geom name="cup_h2" type="capsule" size=".006" fromto="0.078 0 0.054  0.070 0 0.036" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" material="cupmat"/>
+        <geom name="cup_h3" type="capsule" size=".006" fromto="0.070 0 0.036  0.040 0 0.030" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" material="cupmat"/>
         </body>
 
         <!--<body name="block2" pos="0 0 .44">-->
