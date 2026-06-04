@@ -1,5 +1,5 @@
 <mujoco model="hsr">
-    <body name="base_link" pos="-.46 -.081 0">
+    <body name="base_link" pos="-.6 -.081 0">
         <!--<site name="touchsensor_site" size="0.25 .5" pos="0 0 .5" type="cylinder" rgba="1 0 0 0"/>-->
         <joint axis="1 0 0" damping="2200" name="slide_x" pos="0 0 0" type="slide" limited="false" range="-10 10"/>
         <!--<joint axis="1 0 0" damping="2200" name="slide_x" pos="0 0 0" type="slide" limited="true" range="-.02 .02"/>-->

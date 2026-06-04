@@ -91,19 +91,16 @@
 <!--          <geom name="block" type="box" mass="1" size=".05 .025 .017" rgba=".8 .1 .1 1" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1"/>-->
 <!--          <freejoint name='blockjoint'/>-->
 <!--        </body>-->
-        <body name="block" pos="0 0 .423">
-          <geom name="block" type="box" mass="1" size=".05 .025 .017" rgba=".8 .1 .1 1" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1"/>
-          <freejoint name="blockjoint"/>
-        </body>
-
-        <body name="block2" pos="0 0.2 .423">
-          <geom name="block2" type="box" mass="1" size=".05 .025 .017" rgba=".1 .8 .1 1" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1"/>
-          <freejoint name="blockjoint2"/>
-        </body>
-
-        <body name="block3" pos="0 -0.2 .423">
-          <geom name="block3" type="box" mass="1" size=".05 .025 .017" rgba=".1 .1 .8 1" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1"/>
-          <freejoint name="blockjoint3"/>
+        <body name="cup" pos="-.1 0.2 .423" euler="0 0 90">
+        <freejoint name="cupjoint"/>
+        <!-- mug body: cylinder upright along z, sitting on its base -->
+        <geom name="cup_body" type="cylinder" size=".04 .05" pos="0 0 .05" mass=".22"
+                condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba=".25 .5 .85 1"/>
+        <!-- handle: 4 capsules forming a C on the +x side; fromto = the two endpoints, the single size value is the radius -->
+        <geom name="cup_h0" type="capsule" size=".006" fromto="0.040 0 0.078  0.070 0 0.072" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba=".25 .5 .85 1"/>
+        <geom name="cup_h1" type="capsule" size=".006" fromto="0.070 0 0.072  0.078 0 0.054" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba=".25 .5 .85 1"/>
+        <geom name="cup_h2" type="capsule" size=".006" fromto="0.078 0 0.054  0.070 0 0.036" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba=".25 .5 .85 1"/>
+        <geom name="cup_h3" type="capsule" size=".006" fromto="0.070 0 0.036  0.040 0 0.030" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba=".25 .5 .85 1"/>
         </body>
 
         <!--<body name="block2" pos="0 0 .44">-->
@@ -142,14 +139,20 @@
                   ctrllimited="true" ctrlrange="-1.57 0.52"/>
 
         <!-- Action indices 8-10: Base actuators (delta control applied in env.py) -->
-        <position gear="3" kp="300" dampratio="1" name="base_x_motor" joint="slide_x"
-                  forcelimited="true" forcerange="-100 100"
+        <!-- A position actuator servos gear*qpos = ctrl, so with gear!=1 the joint only
+             reached ctrl/gear (base_x/y: 1/3 of command; base_roll: 1/5, i.e. +-36deg max),
+             which broke the absolute base targeting in env.py. gear is set to 1 so ctrl maps
+             1:1 to joint position. To preserve the previously-tuned dynamics, the joint-space
+             stiffness (gear^2*kp) and force ceiling (gear*forcerange) are held constant:
+             kp scaled by gear^2 and forcerange by gear. -->
+        <position gear="1" kp="2700" dampratio="1" name="base_x_motor" joint="slide_x"
+                  forcelimited="true" forcerange="-300 300"
                   ctrllimited="true" ctrlrange="-10 10"/>
-        <position gear="3" kp="300" dampratio="1" name="base_y_motor" joint="slide_y"
-                  forcelimited="true" forcerange="-100 100"
+        <position gear="1" kp="2700" dampratio="1" name="base_y_motor" joint="slide_y"
+                  forcelimited="true" forcerange="-300 300"
                   ctrllimited="true" ctrlrange="-10 10"/>
-        <position gear="5" kp="100" name="base_roll_motor" joint="base_roll_joint"
-                  forcelimited="true" forcerange="-100 100"
+        <position gear="1" kp="2500" name="base_roll_motor" joint="base_roll_joint"
+                  forcelimited="true" forcerange="-500 500"
                   ctrllimited="true" ctrlrange="-3.14159 3.14159"/>
 
         <!-- Secondary coupled actuators for finger proximal joints -->
