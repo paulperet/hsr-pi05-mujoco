@@ -34,7 +34,7 @@ def load_policy(model_id: str, device: torch.device):
     Returns:
         tuple: (policy, preprocessor, postprocessor)
     """
-    # Use the FINE-TUNED config (input_features = observation.image.head/hand,
+    # Use the FINE-TUNED config (input_features = observation.images.head/hand,
     # state[8], action[11]) so the loaded model validates against our schema --
     # not the base model's DROID slots (base_0_rgb/left_wrist_0_rgb/...).
     # Weight shapes are unchanged (camera count only affects token count;
@@ -64,8 +64,8 @@ def build_observation(env, task: str):
     """Build the observation dict expected by the PI0.5 policy.
 
     Constructs a raw batch dict with:
-    - observation.image.head: (C, H, W) float32 tensor
-    - observation.image.hand: (C, H, W) float32 tensor
+    - observation.images.head: (C, H, W) float32 tensor
+    - observation.images.hand: (C, H, W) float32 tensor
     - observation.state: (8,) float32 tensor
     - task: natural language instruction string
 
@@ -88,10 +88,10 @@ def build_observation(env, task: str):
     state_tensor = torch.from_numpy(state).float()
 
     # Keys MUST match the training schema (see train_config.json input_features):
-    #   observation.image.head, observation.image.hand, observation.state
+    #   observation.images.head, observation.images.hand, observation.state
     raw_batch = {
-        "observation.image.head": head_tensor,
-        "observation.image.hand": hand_tensor,
+        "observation.images.head": head_tensor,
+        "observation.images.hand": hand_tensor,
         "observation.state": state_tensor,
         "task": task,
     }

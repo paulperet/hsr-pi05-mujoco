@@ -13,8 +13,8 @@ class HSREnv(gym.Env):
     """HSR MuJoCo Environment for PI0.5 policy evaluation.
 
     Matches the training schema:
-    - observation.image.head: 480x640x3 from 'rgbd' camera
-    - observation.image.hand: 480x640x3 from 'hand' camera
+    - observation.images.head: 480x640x3 from 'rgbd' camera
+    - observation.images.hand: 480x640x3 from 'hand' camera
     - observation.state: 8-dim [arm_lift, arm_flex, arm_roll, wrist_flex,
                                 wrist_roll, hand_motor, head_pan, head_tilt]
     - action: 11-dim [8 absolute joint positions + 3 delta base (x, y, theta)]
