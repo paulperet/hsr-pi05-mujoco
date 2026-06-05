@@ -20,10 +20,6 @@ from lerobot.processor.pipeline import ProcessorStepRegistry
 from lerobot.processor.relative_action_processor import RelativeActionsProcessorStep
 from peft import PeftModel
 
-def register_legacy_processor_aliases() -> None:
-    if "relative_actions_processor" not in ProcessorStepRegistry.list():
-        ProcessorStepRegistry.register("relative_actions_processor")(RelativeActionsProcessorStep)
-
 def load_policy(model_id: str, device: torch.device):
     """Load PI0.5 policy and its pre/post processors from HuggingFace.
 
@@ -46,7 +42,6 @@ def load_policy(model_id: str, device: torch.device):
     #policy = PeftModel.from_pretrained(policy, model_id)
     policy.eval()
 
-    register_legacy_processor_aliases()
     preprocess, postprocess = make_pre_post_processors(
         policy.config,
         model_id,
@@ -90,8 +85,8 @@ def build_observation(env, task: str):
     # Keys MUST match the training schema (see train_config.json input_features):
     #   observation.images.head, observation.images.hand, observation.state
     raw_batch = {
-        "observation.images.head": head_tensor,
-        "observation.images.hand": hand_tensor,
+        "observation.image.head": head_tensor,
+        "observation.image.hand": hand_tensor,
         "observation.state": state_tensor,
         "task": task,
     }

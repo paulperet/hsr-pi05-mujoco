@@ -36,9 +36,9 @@ class HSREnv(gym.Env):
 
     # Base joint names for delta action control
     BASE_JOINT_NAMES = [
-        "slide_x",
-        "slide_y",
-        "base_roll_joint",
+        "base_x",
+        "base_y",
+        "base_t",
     ]
 
     # arm_lift_joint range mismatch between dataset and sim.

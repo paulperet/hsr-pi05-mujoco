@@ -13,6 +13,6 @@ imageio
 imageio-ffmpeg
 torch
 torchvision
-lerobot[pi] @ git+https://github.com/huggingface/lerobot.git
+lerobot[pi] @ git+https://github.com/huggingface/lerobot.git@main
 gymnasium
 peft
