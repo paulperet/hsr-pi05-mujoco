@@ -189,8 +189,10 @@
                                 </body>
                                 <body name="hand_l_proximal_link" pos="-0.01675 -0.0245 -0.0175">
                                     <inertial pos="0 0 0" mass="0.15" diaginertia="0.015 0.015 0.015"/>
-                                    <!-- FIX #10: range corrected from "0 20" deg to radians -->
-                                    <joint name="hand_l_proximal_joint" pos="0 0 0" axis="1 0 0" limited="true" range="0 0.349" damping="15"/>
+                                    <!-- Range = 0.58 rad opens the fingers to the real HSR's ~13.5 cm gap.
+                                         Not the URDF's 1.24 rad limit: this model omits the distal
+                                         counter-rotation joint, so 1.24 rad would over-open to ~24 cm. -->
+                                    <joint name="hand_l_proximal_joint" pos="0 0 0" axis="1 0 0" limited="true" range="0 0.58" damping="15"/>
                                     <body name="hand_l_spring_proximal_link" pos="0 0 0">
                                         <inertial pos="0.021418 0.00248 0.022688"
                                                   quat="0.701927 0.0145759 0.051882 0.710208" mass="0.043589"
@@ -227,8 +229,8 @@
                                 </body>
                                 <body name="hand_r_proximal_link" pos="-0.01675 0.0245 -0.0175">
                                     <inertial pos="0 0 0" mass="0.15" diaginertia="0.015 0.015 0.015"/>
-                                    <!-- FIX #10: range corrected from "0 20" deg to radians -->
-                                    <joint name="hand_r_proximal_joint" pos="0 0 0" axis="-1 0 0" limited="true" range="0 0.349" damping="15"/>
+                                    <!-- Range = 0.58 rad: see hand_l_proximal_joint (matches real ~13.5 cm opening). -->
+                                    <joint name="hand_r_proximal_joint" pos="0 0 0" axis="-1 0 0" limited="true" range="0 0.58" damping="15"/>
                                     <body name="hand_r_spring_proximal_link" pos="0 0 0">
                                         <inertial pos="0.013203 0.002096 0.023311"
                                                   quat="0.696227 -0.0447896 0.0033388 0.716415" mass="0.043956"

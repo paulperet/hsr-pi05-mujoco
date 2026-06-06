@@ -48,6 +48,15 @@ class HSREnv(gym.Env):
     ARM_LIFT_DATA_MAX = 0.69
     ARM_LIFT_SIM_MAX = 0.34
 
+    # Finger proximal joints track hand_motor_joint 1:1 (the official URDF defines
+    # both hand_l/r_proximal_joint as <mimic joint="hand_motor_joint"/>, default
+    # multiplier=1, offset=0), clamped to the sim proximal range [0, this]. The cap
+    # of 0.58 rad opens the fingers to the real HSR's ~13.5 cm; it is NOT the URDF's
+    # 1.24 rad limit, because this model omits the distal counter-rotation joint, so
+    # 1.24 rad would over-open the rigid fingers to ~24 cm. The two proximal joints
+    # have opposite axes, so both fingers take the same (positive) value.
+    HAND_PROXIMAL_MAX = 0.58
+
     # Actuator names in world.xml, ordered to match schema action indices
     ACTUATOR_NAMES = [
         "arm_lift_motor",    # 0
@@ -145,7 +154,7 @@ class HSREnv(gym.Env):
         pose = dict(self.INIT_POSE)
         pose["arm_lift_joint"] *= self.ARM_LIFT_SIM_MAX / self.ARM_LIFT_DATA_MAX
         grip = float(np.clip(
-            (self.INIT_POSE["hand_motor_joint"] + 0.798) / (1.239 + 0.798), 0, 1) * 0.349066)
+            self.INIT_POSE["hand_motor_joint"], 0.0, self.HAND_PROXIMAL_MAX))
         pose["hand_l_proximal_joint"] = grip
         pose["hand_r_proximal_joint"] = grip
         for jname, val in pose.items():
@@ -276,11 +285,9 @@ class HSREnv(gym.Env):
         self.data.ctrl[self._actuator_ids[9]] = current_base_y + world_dy
         self.data.ctrl[self._actuator_ids[10]] = current_base_yaw + action[10]
 
-        # Couple finger proximal joints to hand_motor (simple proportional mapping)
-        hand_motor_val = action[5]
-        # Map hand_motor range to proximal joint range [0, 0.349066]
-        grip_frac = np.clip((hand_motor_val + 0.798) / (1.239 + 0.798), 0, 1)
-        grip_val = grip_frac * 0.349066
+        # Couple finger proximal joints to hand_motor: proximal == hand_motor
+        # (URDF 1:1 mimic, see HAND_PROXIMAL_MAX), clamped to the sim proximal range.
+        grip_val = float(np.clip(action[5], 0.0, self.HAND_PROXIMAL_MAX))
         self.data.ctrl[self._hand_l_proximal_id] = grip_val
         self.data.ctrl[self._hand_r_proximal_id] = grip_val
 

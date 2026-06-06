@@ -158,6 +158,18 @@
         <geom name="cup_h3" type="capsule" size=".006" fromto="0.070 0 0.036  0.040 0 0.030" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" material="cupmat"/>
         </body>
 
+        <body name="cup2" pos="-.1 -.12 .423" euler="0 0 90">
+        <freejoint name="cupjoint2"/>
+        <!-- mug body: cylinder upright along z, sitting on its base -->
+        <geom name="cup_body2" type="cylinder" size=".04 .05" pos="0 0 .05" mass=".22"
+                condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba="0.8 0.1 0.1 1"/>
+        <!-- handle: 4 capsules forming a C on the +x side; fromto = the two endpoints, the single size value is the radius -->
+        <geom name="cup_h02" type="capsule" size=".006" fromto="0.040 0 0.078  0.070 0 0.072" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba="0.8 0.1 0.1 1"/>
+        <geom name="cup_h12" type="capsule" size=".006" fromto="0.070 0 0.072  0.078 0 0.054" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba="0.8 0.1 0.1 1"/>
+        <geom name="cup_h22" type="capsule" size=".006" fromto="0.078 0 0.054  0.070 0 0.036" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba="0.8 0.1 0.1 1"/>
+        <geom name="cup_h32" type="capsule" size=".006" fromto="0.070 0 0.036  0.040 0 0.030" mass=".01" condim="6" solimp="0.99 0.99 0.01" solref="0.01 1" rgba="0.8 0.1 0.1 1"/>
+        </body>
+
         <!--<body name="block2" pos="0 0 .44">-->
           <!--<geom type="box" size=".0317 .0317 .0234" rgba=".1 .8 .1 1" condim="4" solimp="0.99 0.99 0.01" solref="0.01 1"/>-->
           <!--<freejoint name='box2joint'/>-->
@@ -213,10 +225,10 @@
         <!-- Secondary coupled actuators for finger proximal joints -->
         <position gear="1" kp="1000" dampratio="1" name="hand_l_proximal_motor" joint="hand_l_proximal_joint"
                   forcelimited="true" forcerange="-20 20"
-                  ctrllimited="true" ctrlrange="0 0.349066"/>
+                  ctrllimited="true" ctrlrange="0 0.58"/>
         <position gear="1" kp="1000" dampratio="1" name="hand_r_proximal_motor" joint="hand_r_proximal_joint"
                   forcelimited="true" forcerange="-20 20"
-                  ctrllimited="true" ctrlrange="0 0.349066"/>
+                  ctrllimited="true" ctrlrange="0 0.58"/>
 
     </actuator>
     <contact>
